@@ -1,4 +1,6 @@
 # Kaggle-Competitions
 A repo  used to store my kaggle competitions code and the summary 
-- [x] classify-leaves
-- [ ] object detection with SSD
+
+- [x] [Classify Leaves](https://www.kaggle.com/competitions/classify-leaves)
+
+- [ ] [Dog Breed Identification](https://www.kaggle.com/competitions/dog-breed-identification/data)
