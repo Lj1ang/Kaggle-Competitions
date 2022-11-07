@@ -1,3 +1,5 @@
+##  classify-leaves
+
 这是[kaggle树叶分类比赛](https://www.kaggle.com/competitions/classify-leaves)的解答
 
 ## Preprocess
@@ -63,8 +65,79 @@ torchvision 中有已经定义好的model，改掉最后一层fc就行
 - 输入模型，取输出最大值，映射为类名
 - csv处理
 
->补充csv内容
+## 补充知识
 
->补充 load_static_model
+### [SAVING AND LOADING MODELS](https://pytorch.org/tutorials/beginner/saving_loading_models.html#what-is-a-state-dict)
 
-> 文件分类
+1. [torch.save](https://pytorch.org/docs/stable/torch.html?highlight=save#torch.save): Saves a serialized object to disk. This function uses Python’s [pickle](https://docs.python.org/3/library/pickle.html) utility for serialization. Models, tensors, and dictionaries of all kinds of objects can be saved using this function.
+
+   > *“Pickling”* is the process whereby a Python object hierarchy is converted into a byte streamPickling (and unpickling) is alternatively known as “serialization”, “marshalling,” [1](https://docs.python.org/3/library/pickle.html#id7) or “flattening”; however, to avoid confusion, the terms used here are “pickling” and “unpickling”.
+
+2. [torch.load](https://pytorch.org/docs/stable/torch.html?highlight=torch load#torch.load): Uses [pickle](https://docs.python.org/3/library/pickle.html)’s unpickling facilities to deserialize pickled object files to memory. This function also facilitates the device to load the data into (see [Saving & Loading Model Across Devices](https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-model-across-devices)).
+
+3. [torch.nn.Module.load_state_dict](https://pytorch.org/docs/stable/generated/torch.nn.Module.html?highlight=load_state_dict#torch.nn.Module.load_state_dict): Loads a model’s parameter dictionary using a deserialized *state_dict*. For more information on *state_dict*, see [What is a state_dict?](https://pytorch.org/tutorials/beginner/saving_loading_models.html#what-is-a-state-dict).
+
+`state_dict` : dict， maps each  layer to its parameter tensor. only **layers with learnable parameters** (convolutional layers, linear layers, etc.) and registered buffers (batchnorm’s running_mean) 
+
+Optimizer objects (`torch.optim`) also have a *state_dict* -- hyperparameters
+
+**save ** with .pt or .pth file extension
+
+```python
+torch.save(model.state_dict(), PATH)
+```
+
+**load**
+
+```python
+model = TheModelClass(*args, **kwargs)
+model.load_state_dict(torch.load(PATH))
+model.eval() # set dropout and batch normlization layers to eval model
+```
+
+**save** with .ckpt
+
+```
+torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss,
+            ...
+            }, PATH)
+```
+
+**load**
+
+```
+model = TheModelClass(*args, **kwargs)
+optimizer = TheOptimizerClass(*args, **kwargs)
+
+checkpoint = torch.load(PATH)
+model.load_state_dict(checkpoint['model_state_dict'])
+optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+epoch = checkpoint['epoch']
+loss = checkpoint['loss']
+
+model.eval()
+# - or -
+model.train()
+```
+
+### Pandas
+
+**pandas.DataFrame** :wo-dimensional, size-mutable, potentially heterogeneous tabular data.
+
+dataframe.iloc([ a,b:c,d ])分区
+
+### dict
+
+python字典遍历：dict.items()
+
+### TRANSFORMING AND AUGMENTING IMAGES
+
+- module:`torchvision.transforms`  
+
+- accept both PIL imges and tensor(B, C, H, W) images   (refer [docs](https://pytorch.org/vision/stable/transforms.html) for more detail)
+- in validation and test, only use `transforms.Resize((224,224))` and `transforms.ToTensor()`
+
